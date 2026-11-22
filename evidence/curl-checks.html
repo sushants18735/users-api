@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Step 13 — 7 curl checks</title>
+<style>
+  body { margin:0; background:#0b1220; color:#e6edf3; font:13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .bar { background:#1c2536; padding:12px 18px; color:#9fb2c9; border-bottom:1px solid #2b3850; }
+  .bar b { color:#7ee787; }
+  pre { margin:0; padding:18px 22px; white-space:pre-wrap; overflow-wrap:anywhere; }
+</style></head><body>
+<div class="bar">● terminal — <b>users-api</b> — Step 13 — 7 curl checks</div>
+<pre>
+$ curl -i -X POST localhost:3000/api/v1/users -H 'Content-Type: application/json' -d '{...Sita...}'
+HTTP/1.1 201 Created
+X-Request-Id: bb189f7f-ffc8-4334-915c-8a7878e403e9
+Location: /api/v1/users/d1e83f3c-59c1-4d87-b133-08c7f2eb2344
+Content-Type: application/json; charset=utf-8
+Content-Length: 364
+ETag: W/"16c-Ms0TSSriq3TOYJP/tIhWcA3slng"
+Date: Sun, 22 Nov 2026 11:18:32 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"data":{"id":"d1e83f3c-59c1-4d87-b133-08c7f2eb2344","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":"+977-9800000002","dateOfBirth":"2002-11-03","address":{"street":"Lakeside Road 5","city":"Pokhara","postalCode":"33700","country":"Nepal"},"role":"customer","createdAt":"2026-11-22T11:18:32.262Z","updatedAt":"2026-11-22T11:18:32.262Z"}}
+USER_ID=d1e83f3c-59c1-4d87-b133-08c7f2eb2344
+
+$ curl -s localhost:3000/api/v1/users
+{"data":[{"id":"d1e83f3c-59c1-4d87-b133-08c7f2eb2344","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":"+977-9800000002","dateOfBirth":"2002-11-03","address":{"street":"Lakeside Road 5","city":"Pokhara","postalCode":"33700","country":"Nepal"},"role":"customer","createdAt":"2026-11-22T11:18:32.262Z","updatedAt":"2026-11-22T11:18:32.262Z"}],"meta":{"page":1,"limit":20,"total":1,"totalPages":1},"links":{"self":"/api/v1/users?page=1","next":null,"prev":null}}
+
+$ curl -s localhost:3000/api/v1/users/&lt;id&gt;
+{"data":{"id":"d1e83f3c-59c1-4d87-b133-08c7f2eb2344","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":"+977-9800000002","dateOfBirth":"2002-11-03","address":{"street":"Lakeside Road 5","city":"Pokhara","postalCode":"33700","country":"Nepal"},"role":"customer","createdAt":"2026-11-22T11:18:32.262Z","updatedAt":"2026-11-22T11:18:32.262Z"}}
+
+$ curl -s -X PATCH localhost:3000/api/v1/users/&lt;id&gt; -d '{"phone":"+977-9811111111"}'
+{"data":{"id":"d1e83f3c-59c1-4d87-b133-08c7f2eb2344","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":"+977-9811111111","dateOfBirth":"2002-11-03","address":{"street":"Lakeside Road 5","city":"Pokhara","postalCode":"33700","country":"Nepal"},"role":"customer","createdAt":"2026-11-22T11:18:32.262Z","updatedAt":"2026-11-22T11:18:32.488Z"}}
+
+$ curl -s -w 'HTTP %{http_code}' -X POST localhost:3000/api/v1/users -d '{...SITA@example.com...}'
+{"type":"about:blank","title":"Conflict","status":409,"detail":"Email sita@example.com is already registered","instance":"/api/v1/users","requestId":"5b2006c2-dcfa-4a09-8529-e02c20c764e3"}
+HTTP 409
+
+$ curl -s -w 'HTTP %{http_code}' -X POST localhost:3000/api/v1/users -d '{...role:admin...}'
+{"type":"about:blank","title":"Bad Request","status":400,"detail":"Request body failed validation","instance":"/api/v1/users","requestId":"b6c687b3-51eb-4417-b7d3-ef94bfb5ef8c","errors":[{"field":"role","message":"is not allowed"}]}
+HTTP 400
+
+$ curl -s -o /dev/null -w '%{http_code}' -X DELETE localhost:3000/api/v1/users/&lt;id&gt;
+204
+
+$ curl -s -o /dev/null -w '%{http_code}' localhost:3000/api/v1/users/&lt;id&gt;
+404
+</pre>
+</body></html>

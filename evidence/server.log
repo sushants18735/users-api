@@ -1,0 +1,15 @@
+
+> users-api@1.0.0 start
+> node --env-file-if-exists=.env src/server.js
+
+👤 Users API on http://127.0.0.1:3000 (development, pid 2668)
+GET /health 200 3.4ms 56e5ef70-e44b-44b3-b7d8-a0d48b19001d
+POST /api/v1/users 201 38.4ms bb189f7f-ffc8-4334-915c-8a7878e403e9
+GET /api/v1/users 200 0.6ms e857f6f3-dfbf-4d21-bd33-69ee4a5f982b
+GET /api/v1/users/d1e83f3c-59c1-4d87-b133-08c7f2eb2344 200 0.5ms 23ebf94f-c5e1-4d75-948a-ad299c3b8ef9
+PATCH /api/v1/users/d1e83f3c-59c1-4d87-b133-08c7f2eb2344 200 0.7ms 4d4067a9-cb49-4882-aea8-5ecf409931c9
+POST /api/v1/users 409 0.6ms 5b2006c2-dcfa-4a09-8529-e02c20c764e3
+POST /api/v1/users 400 0.4ms b6c687b3-51eb-4417-b7d3-ef94bfb5ef8c
+DELETE /api/v1/users/d1e83f3c-59c1-4d87-b133-08c7f2eb2344 204 0.2ms 3cf073e6-f99c-4010-9249-1952288257fa
+GET /api/v1/users/d1e83f3c-59c1-4d87-b133-08c7f2eb2344 404 0.5ms 97e50f80-696e-4625-b2f3-1039eeaac135
+SIGTERM received — shutting down

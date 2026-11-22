@@ -1,0 +1,13 @@
+# Assignment 2.1 — Short answers
+
+## 1. The job of each layer in this code
+
+The **route** layer (`src/routes/users.routes.js`) is the only place that knows URLs and HTTP verbs: it maps `/api/v1/users` GET/POST/PATCH/DELETE to controller methods and attaches `validateBody` before the write methods. The **controller** (`src/controllers/users.controller.js`) also knows HTTP — it reads `req.query`, `req.params` and the already-cleaned `req.body`, calls the service, and decides the response (`201` with a `Location` header, `200` with `{ data, meta, links }`, or `204`). The **service** (`src/services/users.service.js`) holds the business rules: it checks that the email is not already registered (ignoring case), hashes the password with scrypt before storing it, strips `passwordHash` through `toPublicUser`, and throws `HttpError`s without ever touching `res`. The **repository** (`src/repositories/in-memory.repository.js` + `users.repository.js`) is the only layer that touches storage: it keeps rows in a private `Map`, generates ids/timestamps, returns `structuredClone` copies, and adds the users-only `findByEmail` query. Because repository methods are `async` and named like a future database layer, Unit 3 can swap in Prisma without changing the service.
+
+## 2. Why arrow-function class fields in UsersController?
+
+Express receives `controller.list` as a plain callback, so it calls the function without the controller instance as `this`; a normal class method would see `this === undefined` and throw when it tried `this.usersService`. An arrow-function class field captures `this` lexically when the instance is constructed, so the method keeps working no matter how Express invokes it. You can see the exposure in `usersRouter.get('/', controller.list)` — the method is detached from the object before Express calls it. This is a small, local fix that avoids `.bind(this)` in the constructor.
+
+## 3. Why a self-created service is hard to test
+
+`UsersController`'s constructor calls `new UsersService(new UsersRepository())` itself, so the dependencies are hard-coded and cannot be replaced from outside. A unit test therefore cannot inject a fake repository with known rows, nor the injectable `hash` function with a fast fake instead of real scrypt — it must either use the real in-memory store and real hashing or resort to monkey-patching/module mocking. The repository instance also lives inside a controller created once at module load, which makes isolating or resetting test state awkward. Assignment 2.2 fixes this by passing the service (and its repository) into the controller constructor, so tests can supply fakes and the class becomes independent of concrete implementations.
