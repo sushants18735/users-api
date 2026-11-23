@@ -14,15 +14,15 @@ printf '%s\n' "$POST1"
 ID=$(printf '%s\n' "$POST1" | tail -n 1 | python3 -c 'import json,sys; print(json.load(sys.stdin)["data"]["id"])')
 printf 'USER_ID=%s\n' "$ID"
 
-show "curl -s localhost:3000/api/v1/users"
-curl -sS "$BASE/api/v1/users"; printf '\n'
+show "curl -s -w 'HTTP %{http_code}' localhost:3000/api/v1/users"
+curl -sS -w '\nHTTP %{http_code}\n' "$BASE/api/v1/users"
 
-show "curl -s localhost:3000/api/v1/users/<id>"
-curl -sS "$BASE/api/v1/users/$ID"; printf '\n'
+show "curl -s -w 'HTTP %{http_code}' localhost:3000/api/v1/users/<id>"
+curl -sS -w '\nHTTP %{http_code}\n' "$BASE/api/v1/users/$ID"
 
-show "curl -s -X PATCH localhost:3000/api/v1/users/<id> -d '{\"phone\":\"+977-9811111111\"}'"
-curl -sS -X PATCH "$BASE/api/v1/users/$ID" \
-  -H 'Content-Type: application/json' -d '{"phone":"+977-9811111111"}'; printf '\n'
+show "curl -s -w 'HTTP %{http_code}' -X PATCH localhost:3000/api/v1/users/<id> -d '{\"phone\":\"+977-9811111111\"}'"
+curl -sS -w '\nHTTP %{http_code}\n' -X PATCH "$BASE/api/v1/users/$ID" \
+  -H 'Content-Type: application/json' -d '{"phone":"+977-9811111111"}'
 
 show "curl -s -w 'HTTP %{http_code}' -X POST localhost:3000/api/v1/users -d '{...SITA@example.com...}'"
 curl -sS -w '\nHTTP %{http_code}\n' -X POST "$BASE/api/v1/users" -H 'Content-Type: application/json' \

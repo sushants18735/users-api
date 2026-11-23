@@ -10,33 +10,36 @@
 <pre>
 $ curl -i -X POST localhost:3000/api/v1/users -H 'Content-Type: application/json' -d '{...Sita...}'
 HTTP/1.1 201 Created
-X-Request-Id: bb189f7f-ffc8-4334-915c-8a7878e403e9
-Location: /api/v1/users/d1e83f3c-59c1-4d87-b133-08c7f2eb2344
+X-Request-Id: 32c31bae-b7a2-4154-9e84-6c7c20e7a698
+Location: /api/v1/users/6f039916-4cb0-4947-b799-6b19348551c2
 Content-Type: application/json; charset=utf-8
 Content-Length: 364
-ETag: W/"16c-Ms0TSSriq3TOYJP/tIhWcA3slng"
-Date: Sun, 22 Nov 2026 11:18:32 GMT
+ETag: W/"16c-NEY5a8EVk6ZzrNvzyCXlPpt/N+A"
+Date: Mon, 23 Nov 2026 08:49:39 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
-{"data":{"id":"d1e83f3c-59c1-4d87-b133-08c7f2eb2344","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":"+977-9800000002","dateOfBirth":"2002-11-03","address":{"street":"Lakeside Road 5","city":"Pokhara","postalCode":"33700","country":"Nepal"},"role":"customer","createdAt":"2026-11-22T11:18:32.262Z","updatedAt":"2026-11-22T11:18:32.262Z"}}
-USER_ID=d1e83f3c-59c1-4d87-b133-08c7f2eb2344
+{"data":{"id":"6f039916-4cb0-4947-b799-6b19348551c2","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":"+977-9800000002","dateOfBirth":"2002-11-03","address":{"street":"Lakeside Road 5","city":"Pokhara","postalCode":"33700","country":"Nepal"},"role":"customer","createdAt":"2026-11-23T08:49:39.189Z","updatedAt":"2026-11-23T08:49:39.189Z"}}
+USER_ID=6f039916-4cb0-4947-b799-6b19348551c2
 
-$ curl -s localhost:3000/api/v1/users
-{"data":[{"id":"d1e83f3c-59c1-4d87-b133-08c7f2eb2344","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":"+977-9800000002","dateOfBirth":"2002-11-03","address":{"street":"Lakeside Road 5","city":"Pokhara","postalCode":"33700","country":"Nepal"},"role":"customer","createdAt":"2026-11-22T11:18:32.262Z","updatedAt":"2026-11-22T11:18:32.262Z"}],"meta":{"page":1,"limit":20,"total":1,"totalPages":1},"links":{"self":"/api/v1/users?page=1","next":null,"prev":null}}
+$ curl -s -w 'HTTP %{http_code}' localhost:3000/api/v1/users
+{"data":[{"id":"6f039916-4cb0-4947-b799-6b19348551c2","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":"+977-9800000002","dateOfBirth":"2002-11-03","address":{"street":"Lakeside Road 5","city":"Pokhara","postalCode":"33700","country":"Nepal"},"role":"customer","createdAt":"2026-11-23T08:49:39.189Z","updatedAt":"2026-11-23T08:49:39.189Z"}],"meta":{"page":1,"limit":20,"total":1,"totalPages":1},"links":{"self":"/api/v1/users?page=1","next":null,"prev":null}}
+HTTP 200
 
-$ curl -s localhost:3000/api/v1/users/&lt;id&gt;
-{"data":{"id":"d1e83f3c-59c1-4d87-b133-08c7f2eb2344","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":"+977-9800000002","dateOfBirth":"2002-11-03","address":{"street":"Lakeside Road 5","city":"Pokhara","postalCode":"33700","country":"Nepal"},"role":"customer","createdAt":"2026-11-22T11:18:32.262Z","updatedAt":"2026-11-22T11:18:32.262Z"}}
+$ curl -s -w 'HTTP %{http_code}' localhost:3000/api/v1/users/&lt;id&gt;
+{"data":{"id":"6f039916-4cb0-4947-b799-6b19348551c2","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":"+977-9800000002","dateOfBirth":"2002-11-03","address":{"street":"Lakeside Road 5","city":"Pokhara","postalCode":"33700","country":"Nepal"},"role":"customer","createdAt":"2026-11-23T08:49:39.189Z","updatedAt":"2026-11-23T08:49:39.189Z"}}
+HTTP 200
 
-$ curl -s -X PATCH localhost:3000/api/v1/users/&lt;id&gt; -d '{"phone":"+977-9811111111"}'
-{"data":{"id":"d1e83f3c-59c1-4d87-b133-08c7f2eb2344","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":"+977-9811111111","dateOfBirth":"2002-11-03","address":{"street":"Lakeside Road 5","city":"Pokhara","postalCode":"33700","country":"Nepal"},"role":"customer","createdAt":"2026-11-22T11:18:32.262Z","updatedAt":"2026-11-22T11:18:32.488Z"}}
+$ curl -s -w 'HTTP %{http_code}' -X PATCH localhost:3000/api/v1/users/&lt;id&gt; -d '{"phone":"+977-9811111111"}'
+{"data":{"id":"6f039916-4cb0-4947-b799-6b19348551c2","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":"+977-9811111111","dateOfBirth":"2002-11-03","address":{"street":"Lakeside Road 5","city":"Pokhara","postalCode":"33700","country":"Nepal"},"role":"customer","createdAt":"2026-11-23T08:49:39.189Z","updatedAt":"2026-11-23T08:49:39.245Z"}}
+HTTP 200
 
 $ curl -s -w 'HTTP %{http_code}' -X POST localhost:3000/api/v1/users -d '{...SITA@example.com...}'
-{"type":"about:blank","title":"Conflict","status":409,"detail":"Email sita@example.com is already registered","instance":"/api/v1/users","requestId":"5b2006c2-dcfa-4a09-8529-e02c20c764e3"}
+{"type":"about:blank","title":"Conflict","status":409,"detail":"Email sita@example.com is already registered","instance":"/api/v1/users","requestId":"3c787234-54d6-4257-b0dc-fed47850a8c2"}
 HTTP 409
 
 $ curl -s -w 'HTTP %{http_code}' -X POST localhost:3000/api/v1/users -d '{...role:admin...}'
-{"type":"about:blank","title":"Bad Request","status":400,"detail":"Request body failed validation","instance":"/api/v1/users","requestId":"b6c687b3-51eb-4417-b7d3-ef94bfb5ef8c","errors":[{"field":"role","message":"is not allowed"}]}
+{"type":"about:blank","title":"Bad Request","status":400,"detail":"Request body failed validation","instance":"/api/v1/users","requestId":"c99c0e77-1009-49ad-9614-e36113a3615b","errors":[{"field":"role","message":"is not allowed"}]}
 HTTP 400
 
 $ curl -s -o /dev/null -w '%{http_code}' -X DELETE localhost:3000/api/v1/users/&lt;id&gt;
