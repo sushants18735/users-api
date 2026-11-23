@@ -1,7 +1,10 @@
 import { createApp } from './app.js';
 import { config } from './config/env.js';
+import { createContainer } from './container.js';
 
-const app = createApp();
+// The composition root runs here: build the objects once, then hand them to Express.
+const container = createContainer();
+const app = createApp(container);
 
 const server = app.listen(config.port, config.host, () => {
   console.log(`👤 Users API on http://${config.host}:${config.port} (${config.env}, pid ${process.pid})`);
