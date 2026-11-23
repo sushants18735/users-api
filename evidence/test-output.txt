@@ -1,0 +1,13 @@
+
+> users-api@1.0.0 test
+> vitest run
+
+
+ RUN  v5.1.1 /Users/sushantbhandari/Desktop/web engineeirng/users-api
+
+
+ Test Files  3 passed (3)
+      Tests  23 passed (23)
+   Start at  14:41:23
+   Duration  139ms (import 47%, tests 32%, transform 17%, worker 4%)
+

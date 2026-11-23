@@ -1,0 +1,15 @@
+# Short answers — Assignment 2.2
+
+**1. What happens if a middleware never calls `next()` and never sends a response? What would a form-encoded `POST /api/v1/users` return if `requireJson` were registered after `app.use('/api/v1/users', ...)`, and why?**
+
+The request hangs: Express has no signal to move on or to answer, so the client waits until its own timeout and the connection is eventually dropped with no status line. If `requireJson` were registered after the users router, the router would already have handled the request, so the middleware would never run at all. A form-encoded `POST /api/v1/users` would then skip `express.json()` (which ignores non-JSON bodies), `req.body` would be `undefined`, and `validateBody` would answer **400 "Request body failed validation"** instead of **415**. That is why registration order matters: middleware only sees requests that reach it, and anything after a route is only reached if that route calls `next()`.
+
+**2. Explain Dependency Injection in your own words, using your `container.js` as the example.**
+
+Dependency Injection means a class receives the objects it needs instead of building them itself. In my `container.js`, `createContainer()` is the composition root: it creates the `UsersRepository`, passes it into `UsersService`, then passes the service into `UsersController`, and returns all three. Nothing else in the app calls `new` for those building blocks — `server.js` just calls `createContainer()` once and hands the result to `createApp()`. The `overrides` argument makes the wiring swappable: production calls `createContainer()`, while tests call `createContainer({ hashPassword: fakeHasher })` or `createContainer({ usersService: fakeService })`. Because the controller only knows the interface (`list`, `getById`, `create`, `update`, `remove`), Unit 3 can replace the in-memory repository with PostgreSQL by changing one line in the container.
+
+**3. Name two tests in Part C that could not be written with the Assignment 2.1 code, and explain why.**
+
+The controller unit test (`tests/unit/users.controller.test.js`) is impossible in 2.1, because the constructor did `new UsersService(new UsersRepository())` itself, so a fake service could not be injected and every call would hit the real in-memory store and real scrypt hashing. The integration test "POST → 201, and the injected hasher was used" is also impossible, because 2.1 offered no way to replace `hashPassword`, so the test would have to wait for real scrypt and could not assert a known hash. The "each test starts with an empty store" test likewise depends on `createContainer()` being called in `beforeEach`, whereas 2.1 created one repository at module load and shared it for the whole process.
+
+**Bonus — `responseTime` middleware.** `src/middleware/response-time.js` records `process.hrtime.bigint()` on entry and wraps `res.writeHead`, setting `X-Response-Time` just before the headers are flushed (setting it on the `finish` event would be too late). `tests/integration/users.api.test.js` asserts the header matches `/^\d+(\.\d+)?ms$/` on every response.

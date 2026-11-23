@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Assignment 2.2 — 415 / 400 / 404 + X-Response-Time</title>
+<style>
+  body { margin:0; background:#0b1220; color:#e6edf3; font:13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .bar { background:#1c2536; padding:12px 18px; color:#9fb2c9; border-bottom:1px solid #2b3850; }
+  .bar b { color:#7ee787; }
+  pre { margin:0; padding:18px 22px; white-space:pre-wrap; overflow-wrap:anywhere; }
+</style></head><body>
+<div class="bar">● terminal — <b>users-api</b> — Assignment 2.2 — 415 / 400 / 404 + X-Response-Time</div>
+<pre>
+$ curl -s -X POST localhost:3000/api/v1/users -d 'firstName=Sita'
+{"type":"about:blank","title":"Unsupported Media Type","status":415,"detail":"Content-Type must be application/json","instance":"/api/v1/users","requestId":"59a9fdf6-8e92-4828-92cd-861ebd31c94a"}
+HTTP 415
+
+$ curl -s localhost:3000/api/v1/users/123
+{"type":"about:blank","title":"Bad Request","status":400,"detail":"id must be a valid UUID","instance":"/api/v1/users/123","requestId":"7f73bcc6-1275-42a2-8afb-34c7f3434fe4"}
+HTTP 400
+
+$ curl -s localhost:3000/api/v1/users/15cfde80-9253-4e58-a113-a87a9e67498a
+{"type":"about:blank","title":"Not Found","status":404,"detail":"User 15cfde80-9253-4e58-a113-a87a9e67498a does not exist","instance":"/api/v1/users/15cfde80-9253-4e58-a113-a87a9e67498a","requestId":"69bfc6c6-81b4-4abf-87ec-9b44d1f69493"}
+HTTP 404
+
+$ curl -sI localhost:3000/health   # bonus: X-Response-Time
+HTTP/1.1 200 OK
+X-Request-Id: 445872f3-7fd1-4a3e-9ad0-d17a9f9701c9
+Content-Type: application/json; charset=utf-8
+Content-Length: 30
+ETag: W/"1e-n15lIUbOBBXHhMweXIb/ZZjAGRc"
+X-Response-Time: 0.24ms
+Date: Mon, 23 Nov 2026 08:56:23 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+</pre>
+</body></html>
