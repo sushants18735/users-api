@@ -2,7 +2,6 @@ import { pageLinks } from '../utils/query.js';
 
 // Dependency Injection: the controller RECEIVES its service instead of creating it.
 // It no longer imports UsersService or UsersRepository at all.
-// Methods are ARROW FUNCTIONS so `this` still works when Express calls them as plain callbacks.
 export class UsersController {
   constructor(usersService) {
     this.usersService = usersService;
@@ -24,6 +23,11 @@ export class UsersController {
 
   update = async (req, res) => {
     res.json({ data: await this.usersService.update(req.params.id, req.body) });
+  };
+
+  // Admin only (RBAC): PATCH /users/:id/role  { "role": "admin" }
+  changeRole = async (req, res) => {
+    res.json({ data: await this.usersService.changeRole(req.params.id, req.body.role) });
   };
 
   remove = async (req, res) => {

@@ -1,0 +1,44 @@
+
+$ curl -s http://127.0.0.1:3000/api/v1/users   # anonymous → 401
+{"type":"about:blank","title":"Unauthorized","status":401,"detail":"Missing Bearer access token","instance":"/api/v1/users","requestId":"316be939-7762-4f60-b5fe-33b2792cab39"}
+HTTP 401
+
+$ curl -s -X POST http://127.0.0.1:3000/api/v1/auth/register -d '{...Sita...}'   # → 201 + Bearer token
+{"data":{"user":{"id":"53ba3b6c-fe7f-4530-a003-aad666e5165d","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":null,"dateOfBirth":null,"address":null,"githubId":null,"role":"customer","createdAt":"2026-11-24T03:47:41.179Z","updatedAt":"2026-11-24T03:47:41.179Z"},"accessToken":"<REDACTED>","tokenType":"Bearer","expiresIn":900}}
+
+$ node -e '...decode base64url payload...'   # JWT payload is encoded, NOT encrypted
+{"role":"customer","iat":1795492061,"exp":1795492961,"aud":"users-api","iss":"users-api","sub":"<user-id>"}
+
+$ curl -s http://127.0.0.1:3000/api/v1/auth/me -H 'Authorization: Bearer <SITA>'   # → 200
+{"data":{"id":"53ba3b6c-fe7f-4530-a003-aad666e5165d","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":null,"dateOfBirth":null,"address":null,"githubId":null,"role":"customer","createdAt":"2026-11-24T03:47:41.179Z","updatedAt":"2026-11-24T03:47:41.179Z"}}
+HTTP 200
+
+$ curl -s http://127.0.0.1:3000/api/v1/users -H 'Authorization: Bearer <SITA>'   # RBAC: customer → 403
+{"type":"about:blank","title":"Forbidden","status":403,"detail":"Requires role: admin","instance":"/api/v1/users","requestId":"ca343f8c-da33-41b7-bb09-5ec73e22dfab"}
+HTTP 403
+
+$ curl -s -X POST http://127.0.0.1:3000/api/v1/auth/login -d 'admin@users-api.test'   # → 200
+{"data":{"user":{"id":"2484f90b-9b60-4071-89eb-ed4c9736fde4","firstName":"Admin","lastName":"User","email":"admin@users-api.test","phone":null,"dateOfBirth":null,"address":null,"githubId":null,"role":"admin","createdAt":"2026-11-24T03:47:21.524Z","updatedAt":"2026-11-24T03:47:21.524Z"},"accessToken":"<REDACTED>","tokenType":"Bearer","expiresIn":900}}
+
+$ curl -s http://127.0.0.1:3000/api/v1/users -H 'Authorization: Bearer <ADMIN>'   # RBAC: admin → 200
+{"data":[{"id":"53ba3b6c-fe7f-4530-a003-aad666e5165d","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":null,"dateOfBirth":null,"address":null,"githubId":null,"role":"customer","createdAt":"2026-11-24T03:47:41.179Z","updatedAt":"2026-11-24T03:47:41.179Z"},{"id":"2484f90b-9b60-4071-89eb-ed4c9736fde4","firstName":"Admin","lastName":"User","email":"admin@users-api.test","phone":null,"dateOfBirth":null,"address":null,"githubId":null,"role":"admin","createdAt":"2026-11-24T03:47:21.524Z","updatedAt":"2026-11-24T03:47:21.524Z"}],"meta":{"page":1,"limit":20,"total":2,"totalPages":1},"links":{"self":"/api/v1/users?page=1","next":null,"prev":null}}
+HTTP 200
+
+$ curl -s http://127.0.0.1:3000/api/v1/users/53ba3b6c-fe7f-4530-a003-aad666e5165d -H 'Authorization: Bearer <SITA>'   # ABAC: own profile → 200
+{"data":{"id":"53ba3b6c-fe7f-4530-a003-aad666e5165d","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":null,"dateOfBirth":null,"address":null,"githubId":null,"role":"customer","createdAt":"2026-11-24T03:47:41.179Z","updatedAt":"2026-11-24T03:47:41.179Z"}}
+HTTP 200
+
+$ curl -s http://127.0.0.1:3000/api/v1/users/2484f90b-9b60-4071-89eb-ed4c9736fde4 -H 'Authorization: Bearer <SITA>'   # ABAC: someone else → 403
+{"type":"about:blank","title":"Forbidden","status":403,"detail":"You are not allowed to perform this action","instance":"/api/v1/users/2484f90b-9b60-4071-89eb-ed4c9736fde4","requestId":"f9e93ae9-6cf8-4d09-8949-06b72758e55d"}
+HTTP 403
+
+$ curl -s -b sita.txt -c sita.txt -X POST http://127.0.0.1:3000/api/v1/auth/refresh   # rotation → 200 + new cookie
+{"data":{"user":{"id":"53ba3b6c-fe7f-4530-a003-aad666e5165d","firstName":"Sita","lastName":"Gurung","email":"sita@example.com","phone":null,"dateOfBirth":null,"address":null,"githubId":null,"role":"customer","createdAt":"2026-11-24T03:47:41.179Z","updatedAt":"2026-11-24T03:47:41.179Z"},"accessToken":"<REDACTED>","tokenType":"Bearer","expiresIn":900}}
+HTTP 200
+
+$ curl -s -o /dev/null -w '%{http_code}' -b sita.txt -X POST http://127.0.0.1:3000/api/v1/auth/logout   # → 204
+204
+
+$ curl -s -b sita.txt -X POST http://127.0.0.1:3000/api/v1/auth/refresh   # after logout → 401
+{"type":"about:blank","title":"Unauthorized","status":401,"detail":"Refresh token reuse detected — please log in again","instance":"/api/v1/auth/refresh","requestId":"f7432282-4a0c-455c-802a-8611ade2af19"}
+HTTP 401

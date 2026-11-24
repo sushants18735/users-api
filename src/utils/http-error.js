@@ -14,6 +14,11 @@ export class HttpError extends Error {
 export const badRequest = (detail, errors) =>
   new HttpError(400, 'Bad Request', detail, errors ? { errors } : {});
 
+export const unauthorized = (detail = 'Authentication required') => new HttpError(401, 'Unauthorized', detail);
+
+export const forbidden = (detail = 'You are not allowed to perform this action') =>
+  new HttpError(403, 'Forbidden', detail);
+
 export const notFound = (detail) => new HttpError(404, 'Not Found', detail);
 
 export const conflict = (detail) => new HttpError(409, 'Conflict', detail);
