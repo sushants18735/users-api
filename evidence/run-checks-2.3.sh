@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 # Assignment 2.3 Part E: end-to-end auth/authorization checks against a running server.
-# Start the server first: npm run dev
+# Start the server first (IN A SEPARATE TERMINAL): npm run dev
+set -euo pipefail
+
 API=http://127.0.0.1:3000/api/v1
+if ! curl -fsS --max-time 3 http://127.0.0.1:3000/health >/dev/null 2>&1; then
+  echo "ERROR: no server is responding on http://127.0.0.1:3000/health" >&2
+  echo "Keep 'npm run dev' running in ANOTHER terminal, then re-run this script." >&2
+  exit 1
+fi
 COOKIES="${TMPDIR:-/tmp}/users-api-2.3-cookies"
 mkdir -p "$COOKIES"
 
